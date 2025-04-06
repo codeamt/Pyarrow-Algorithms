@@ -3,7 +3,37 @@ import pyarrow.compute as pc
 from datetime import datetime
 
 class TextOperation:
-    """PyArrow-optimized text operation container"""
+    """PyArrow-optimized container for representing text operations.
+
+    This class provides a way to represent and manipulate text operations, 
+    such as insertions, deletions, and retentions, using PyArrow data 
+    structures for efficiency. It's designed to support collaborative 
+    text editing scenarios, where multiple users can concurrently modify 
+    a shared document.
+
+    Text operations are stored as a sequence of actions, each with a type, 
+    position, and optional text content or length. These operations can 
+    be composed and transformed to maintain consistency across different 
+    clients' edits.
+
+    Attributes:
+        ops (pyarrow.Array): A PyArrow array storing the sequence of text 
+                             operations. Each element is a struct containing:
+                               - 'type': The type of operation ('retain', 'insert', 'delete').
+                               - 'pos': The position of the operation (not used currently).
+                               - 'text': The text content for 'insert' or 'delete' operations.
+                               - 'length': The length of the operation (positive for 'retain', 
+                                          negative for 'delete').
+
+    Example:
+        >>> op = TextOperation()
+        >>> op.retain(5)  # Retain the first 5 characters
+        >>> op.insert("hello")  # Insert "hello" at the current position
+        >>> op.delete("world")  # Delete "world" from the current position
+        >>> composed_op = op.compose(other_op)  # Compose with another operation
+        >>> transformed_op = op.transform(other_op)  # Transform against another operation
+
+    """
     def __init__(self):
         self.ops = pa.array([], type=pa.struct([
             ('type', pa.string()),
@@ -177,7 +207,40 @@ class TextOperation:
         )
 
 class OTVersionControl:
-    """PyArrow-optimized version control system for collaborative editing"""
+    """PyArrow-optimized version control system for collaborative editing.
+
+    This class provides a mechanism for managing the version history of 
+    a collaboratively edited document, leveraging PyArrow for efficient 
+    data storage and operations. It utilizes Operational Transformations 
+    (OT) to ensure consistency and concurrency among multiple users 
+    modifying the same document.
+
+    The version control system maintains a history of operations performed 
+    on the document, along with timestamps, client IDs, and version 
+    numbers. It allows for applying new operations, transforming them 
+    against concurrent edits, and retrieving the current state or 
+    historical versions of the document.
+
+    Attributes:
+        history (pyarrow.Table): A PyArrow Table storing the operation history. 
+                                  Each row represents an operation and contains:
+                                      - 'timestamp': The timestamp of the operation.
+                                      - 'client_id': The ID of the client that performed 
+                                                    the operation.
+                                      - 'version': The version number of the operation.
+                                      - 'operation': The TextOperation object representing 
+                                                    the operation.
+        current_text (pyarrow.StringArray): The current state of the document 
+                                            as a PyArrow StringArray.
+        version (int): The current version number of the document.
+
+    Example:
+        >>> version_control = OTVersionControl()
+        >>> version_control.apply_operation("client1", operation1)  # Apply an operation
+        >>> current_state = version_control.get_state()  # Get the current document state
+        >>> history = version_control.get_version_history()  # Get the operation history
+
+    """
     def __init__(self):
         self.history = pa.Table.from_arrays(
             arrays=[[], [], [], []],

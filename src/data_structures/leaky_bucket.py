@@ -3,10 +3,36 @@ import pyarrow.compute as pc
 import time
 
 class LeakyBucket:
-    """PyArrow-optimized rate limiter with batch operations
-    Args:
-    capacity: Maximum token capacity
-    leak_rate: Tokens per second
+    """PyArrow-optimized rate limiter with batch operations.
+
+    This class implements a leaky bucket algorithm for rate limiting, 
+    leveraging PyArrow for efficient data handling and vectorized 
+    operations. It allows you to control the rate at which events or 
+    requests are processed, preventing bursts and ensuring a smoother 
+    flow.
+
+    The leaky bucket analogy imagines a bucket with a fixed capacity. 
+    Tokens (representing events or requests) are added to the bucket 
+    at a constant rate. If the bucket is full, new tokens are discarded. 
+    Tokens are removed from the bucket when events are processed.
+
+    This implementation supports both single and batch token consumption, 
+    as well as an option to wait until tokens become available.
+
+    Attributes:
+        capacity (pyarrow.Scalar): The maximum number of tokens the bucket can hold.
+        leak_rate (pyarrow.Scalar): The rate at which tokens are added to the bucket (tokens per second).
+        _tokens (pyarrow.Scalar): The current number of tokens in the bucket.
+        _last_update (pyarrow.Scalar): The timestamp of the last token update.
+
+    Example:
+        >>> bucket = LeakyBucket(capacity=10, leak_rate=2)  # 10 tokens, 2 tokens/sec
+        >>> if bucket.consume():  # Try to consume 1 token
+        ...     # Process the event
+        ... else:
+        ...     # Rate limit exceeded, wait or drop the event
+        >>> consumed_count = bucket.consume_batch(n=5, max_tokens=3)  # Consume up to 3 batches of 5 tokens
+
     """
     def __init__(self, capacity: int, leak_rate: float):
         self.capacity = pa.scalar(capacity, pa.uint32())

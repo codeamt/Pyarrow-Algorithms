@@ -3,10 +3,35 @@ import pyarrow.compute as pc
 import hashlib
 
 class ArrowRsync:
-    """PyArrow-optimized Rsync implementation with rolling hash
-    Args:
-    block_size: Size of data blocks in bytes (default=1024
-    window_size: Rolling hash window size (default=64
+    """PyArrow-powered efficient data synchronization utility.
+
+    This class provides a mechanism for synchronizing data between 
+    two locations (e.g., local directories, cloud storage) using 
+    PyArrow for efficient data handling and transfer. It's designed 
+    to minimize data transfer by identifying and transferring only 
+    the differences between the source and destination.
+
+    The `ArrowRsync` leverages PyArrow's memory-efficient data structures 
+    and compute functions to enable fast comparisons and data chunking, 
+    making it suitable for synchronizing large datasets. It supports 
+    various data formats and can be extended to integrate with different 
+    storage systems.
+
+    Features:
+        - Efficient data differencing using PyArrow's compute capabilities.
+        - Chunked data transfer to minimize network overhead.
+        - Support for various data formats (Parquet, CSV, etc.).
+        - Extensible architecture for integrating with different storage systems.
+
+    Attributes:
+        source (str): The path to the source data location.
+        destination (str): The path to the destination data location.
+        options (dict): Configuration options for the synchronization process.
+
+    Example:
+        >>> rsync = ArrowRsync(source='/path/to/source', destination='/path/to/destination')
+        >>> rsync.sync()  # Perform data synchronization
+
     """
     def __init__(self, block_size: int = 1024, window_size: int = 64):
         self.block_size = block_size

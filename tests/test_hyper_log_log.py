@@ -4,7 +4,7 @@ import pyarrow.compute as pc
 import numpy as np
 from hypothesis import given, strategies as st
 
-from src.algorithms.hyper_log_log import HyperLogLog
+from data_structures.hyper_log_log import HyperLogLog
 
 class TestHyperLogLog:
     @given(st.lists(st.uuids(), min_size=1000, max_size=100000))

@@ -3,7 +3,7 @@ from multiprocessing.pool import ThreadPool
 import numpy as np
 from hypothesis import given, strategies as st
 
-from src.algorithms.leaky_bucket import LeakyBucket
+from data_structures.leaky_bucket import LeakyBucket
 
 
 class TestLeakyBucket:

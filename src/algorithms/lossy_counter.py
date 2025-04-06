@@ -3,10 +3,41 @@ import pyarrow as pa
 import pyarrow.compute as pc
 
 class LossyCounter:
-    """Stream frequency estimator with PyArrow optimizations
-    Args:
-    epsilon: Maximum error threshold (0 < ε < 1)
-    delta: Confidence parameter (0 < δ < 1)
+    """Stream frequency estimator with PyArrow optimizations.
+
+    This class implements a Lossy Counting algorithm, a probabilistic data 
+    structure used for estimating the frequencies of items in a data stream. 
+    It leverages PyArrow for efficient data storage and computation.
+
+    Lossy Counting provides a memory-efficient way to approximate the 
+    frequencies of frequent items in large datasets, sacrificing some 
+    accuracy for reduced memory usage. It is particularly useful for 
+    applications where the exact frequency of every item is not crucial, 
+    but identifying the most frequent items is important.
+
+    The algorithm maintains a set of buckets, each containing a subset of 
+    items and their estimated counts. Items with lower frequencies are 
+    more likely to be discarded, leading to the "lossy" nature of the 
+    algorithm. The error in frequency estimates is bounded by the 
+    `epsilon` parameter.
+
+    Attributes:
+        epsilon (float): The maximum error threshold (0 < ε < 1).
+        delta (float): The confidence parameter (0 < δ < 1).
+        bucket_width (int): The width of each bucket, calculated based on epsilon.
+        current_count (int): The total number of items processed so far.
+        bucket (pyarrow.StructArray): A PyArrow StructArray storing the items 
+                                     and their estimated counts.
+        error (pyarrow.Array): A PyArrow array storing the error values for 
+                               each bucket.
+
+    Example:
+        >>> counter = LossyCounter(epsilon=0.01)
+        >>> counter.add("item1")
+        >>> counter.add("item2")
+        >>> counter.add("item1")
+        >>> frequent_items = counter.get_most_frequent(min_support=0.05)
+
     """
     def __init__(self, epsilon: float, delta: float = 0.01):
         self.epsilon = epsilon

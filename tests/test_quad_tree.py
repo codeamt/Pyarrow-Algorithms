@@ -1,7 +1,7 @@
 import pytest
 from hypothesis import given, strategies as st
 
-from src.algorithms.quad_tree import QuadTree
+from data_structures.quad_tree import QuadTree
 
 
 class TestQuadTree:

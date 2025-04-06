@@ -3,10 +3,30 @@ import pyarrow.compute as pc
 import hashlib
 
 class ConsistentHash:
-    """PyArrow-optimized consistent hashing with weighted nodes
-    Args:
-    nodes: Initial nodes with weights {node: weight}
-    replicas: Base number of virtual nodes per weight unit
+    """PyArrow-optimized consistent hashing with weighted nodes.
+
+    This class implements a consistent hashing algorithm using PyArrow for 
+    efficient storage and operations. It supports weighted nodes, allowing 
+    for uneven distribution of data across nodes based on their capacity 
+    or other factors.
+
+    Consistent hashing ensures that when a node is added or removed, 
+    only a minimal number of keys need to be remapped to different nodes, 
+    minimizing data movement and disruption.
+
+    Attributes:
+        replicas (int): The base number of virtual nodes per weight unit.
+        ring (pyarrow.Table): A PyArrow Table storing the hash values and 
+                              corresponding nodes, representing the hash ring.
+
+    Example:
+        >>> nodes = {"node1": 1, "node2": 2}  # Node weights
+        >>> ch = ConsistentHash(nodes)
+        >>> ch.get_node("key1")  # Returns the node responsible for "key1"
+        'node2'
+        >>> ch.add_weighted_node("node3", weight=3)
+        >>> ch.remove_node("node1")
+
     """
     def __init__(self, nodes: dict, replicas: int = 100):
         self.replicas = replicas

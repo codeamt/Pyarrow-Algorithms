@@ -2,11 +2,52 @@ import pyarrow as pa
 import pyarrow.compute as pc
 
 class QuadTree:
-    """PyArrow-optimized spatial index with region query capabilities
-    Args:
-    boundary: (x, y, width, height) as Arrow StructScalar
-    capacity: Max points per node before subdivision
-    depth: Current tree depth (internal use)
+    """PyArrow-optimized spatial index for efficient region queries.
+
+    This class implements a QuadTree, a tree-based data structure used 
+    for indexing spatial data. It leverages PyArrow for efficient 
+    data storage and computation, enabling fast region queries to 
+    find points within a specified area.
+
+    The QuadTree recursively subdivides a rectangular region into 
+    four quadrants until each quadrant contains a limited number 
+    of points (defined by the `capacity`). This hierarchical structure 
+    allows for efficient searching by eliminating quadrants that 
+    don't intersect with the query region.
+
+    Attributes:
+        boundary (pyarrow.StructScalar): A PyArrow StructScalar defining 
+                                          the rectangular boundary of the 
+                                          QuadTree node, containing:
+                                              - 'x': The x-coordinate of the center.
+                                              - 'y': The y-coordinate of the center.
+                                              - 'width': The width of the rectangle.
+                                              - 'height': The height of the rectangle.
+        capacity (int): The maximum number of points allowed in a 
+                        quadrant before subdivision.
+        depth (int): The current depth of the QuadTree node in the tree 
+                     structure.
+        points (pyarrow.Array): A PyArrow array storing the points 
+                                 contained within the current node. 
+                                 Each element is a struct containing:
+                                     - 'x': The x-coordinate of the point.
+                                     - 'y': The y-coordinate of the point.
+                                     - 'data': Associated data with the point (optional).
+        children (pyarrow.Array): A PyArrow array storing the child 
+                                   nodes of the current node (if subdivided). 
+                                   Each element is a struct containing:
+                                       - 'nw', 'ne', 'sw', 'se': Child nodes 
+                                                                 representing the 
+                                                                 four quadrants.
+
+    Example:
+        >>> boundary = pa.struct([('x', 0), ('y', 0), ('width', 10), ('height', 10)])
+        >>> quadtree = QuadTree(boundary, capacity=4)
+        >>> point = pa.struct([('x', 2), ('y', 3), ('data', 'point_data')])
+        >>> quadtree.insert(point)  # Insert a point
+        >>> region = pa.struct([('x', 1), ('y', 2), ('width', 3), ('height', 4)])
+        >>> points_in_region = quadtree.query_region_of_interest(region)  # Query for points
+
     """
     def __init__(self, boundary: pa.StructScalar, capacity: int = 4, depth: int = 0):
         self.boundary = boundary

@@ -4,7 +4,7 @@ import pyarrow.compute as pc
 import numpy as np
 from hypothesis import given, strategies as st
 
-from src.algorithms.bloom_filter import BloomFilter
+from data_structures.bloom_filter import BloomFilter
 
 class TestBloomFilter:
     @given(st.integers(1, 1000), st.floats(0.01, 0.2))

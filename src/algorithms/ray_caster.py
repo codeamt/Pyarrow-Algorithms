@@ -2,12 +2,46 @@ import pyarrow as pa
 import pyarrow.compute as pc
 
 class ArrowRayCaster:
-    """PyArrow-optimized ray casting with bounding box optimization
+    """PyArrow-optimized ray casting with bounding box optimization.
+
+    This class provides an efficient implementation of ray casting using 
+    PyArrow for data storage and computation. It's designed for 
+    performing point-in-polygon tests and leverages bounding box 
+    optimization to accelerate the process.
+
+    The `ArrowRayCaster` utilizes PyArrow's columnar data structures and 
+    compute functions to enable vectorized operations and SIMD-based 
+    acceleration, making it well-suited for large datasets and 
+    complex polygon geometries.
+
     Features:
-    - Vectorized batch processing of points
-    - SIMD-accelerated bounding box checks
-    - Columnar memory layout for GPU compatibility
-    - Precomputed polygon metadata
+        - Vectorized batch processing of points for improved performance.
+        - SIMD-accelerated bounding box checks for early rejection of 
+          points outside polygons.
+        - Columnar memory layout for efficient data access and potential 
+          GPU compatibility.
+        - Precomputed polygon metadata (bounding boxes, edge parameters) 
+          to reduce redundant calculations.
+
+    Attributes:
+        polygons (pyarrow.StructArray): A PyArrow StructArray representing 
+                                        the polygons to be used for ray casting. 
+                                        Each element is a struct containing:
+                                            - 'bbox': A struct defining the bounding 
+                                                      box of the polygon.
+                                            - 'edges': An array of structs representing 
+                                                      the edges of the polygon.
+
+    Example:
+        >>> polygons = pa.array([{'bbox': {'min_x': 0, 'max_x': 10, 'min_y': 0, 'max_y': 10}, 
+        ...                       'edges': [{'x1': 0, 'y1': 0, 'x2': 10, 'y2': 0}, 
+        ...                                 {'x1': 10, 'y1': 0, 'x2': 10, 'y2': 10}, 
+        ...                                 {'x1': 10, 'y1': 10, 'x2': 0, 'y2': 10}, 
+        ...                                 {'x1': 0, 'y1': 10, 'x2': 0, 'y2': 0}]}])
+        >>> ray_caster = ArrowRayCaster(polygons)
+        >>> points = pa.array([{'x': 2, 'y': 3}, {'x': 8, 'y': 5}])
+        >>> results = ray_caster.contains(points)  # Perform ray casting
+
     """
     def __init__(self, polygons: pa.StructArray):
         """

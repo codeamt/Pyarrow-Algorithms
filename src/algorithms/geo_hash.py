@@ -1,9 +1,31 @@
 import pyarrow as pa
 
 class GeoHasher:
-    """Geohash encoder/decoder with PyArrow optimizations
-    Args:
-    precision: Hash length (1-12)
+    """Geohash encoder/decoder with PyArrow optimizations.
+
+    This class provides functionality to encode geographic coordinates 
+    (latitude, longitude) into geohashes and decode geohashes back into 
+    coordinates. It leverages PyArrow for efficient data handling and 
+    vectorized operations.
+
+    Geohashes are short alphanumeric strings that represent rectangular 
+    areas on the Earth's surface. They are commonly used for spatial 
+    indexing, proximity searches, and data visualization.
+
+    This implementation supports variable precision (hash length) 
+    and provides methods to calculate neighboring geohashes.
+
+    Attributes:
+        precision (int): The desired length of the geohash (1-12).
+        BASE32 (pyarrow.Array): A PyArrow array containing the base32 characters.
+        BASE32_MAP (dict): A dictionary mapping base32 characters to their indices.
+
+    Example:
+        >>> geohasher = GeoHasher(precision=10)
+        >>> geohash = geohasher.encode(37.7749, -122.4194)  # Encode coordinates
+        >>> coordinates = geohasher.decode(geohash)  # Decode geohash
+        >>> neighbors = geohasher.neighbors(geohash)  # Get neighboring geohashes
+
     """
     BASE32 = pa.array(list('0123456789bcdefghjkmnpqrstuvwxyz'))
     BASE32_MAP = {c:i for i,c in enumerate(BASE32.to_pylist())}
