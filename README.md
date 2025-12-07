@@ -1,5 +1,5 @@
 # PyArrow Algorithms Toolkit
-[![CI Status](https://github.com/codeamt/pyarrow-algorithms/actions/workflows/ci.yml/badge.svg)](https://github.com/codeamt/pyarrow-algorithms/actions)[![Code Coverage](https://codecov.io/gh/codeamt/pyarrow-algorithms/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/pyarrow-algorithms)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI Status](https://github.com/codeamt/pyarrow-algorithms/actions/workflows/ci.yml/badge.svg)](https://github.com/codeamt/pyarrow-algorithms/actions)[![Code Coverage](https://codecov.io/gh/codeamt/pyarrow-algorithms/branch/main/graph/badge.svg)](https://codecov.io/gh/codeamt/pyarrow-algorithms)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 High-performance foundational system design algorithm implementations using PyArrow and modern Python.
 
